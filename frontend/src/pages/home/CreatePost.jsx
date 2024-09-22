@@ -8,6 +8,9 @@ import { toast } from "react-hot-toast";
 const CreatePost = () => {
 	const [text, setText] = useState("");
 	const [img, setImg] = useState(null);
+	const [placeName, setPlaceName] = useState("");
+	const [location, setLocation] = useState("");
+	const [bestSeasonToVisit, setBestSeasonToVisit] = useState("");
 	const imgRef = useRef(null);
 
 	const { data: authUser } = useQuery({ queryKey: ["authUser"] });
@@ -19,14 +22,14 @@ const CreatePost = () => {
 		isError,
 		error,
 	} = useMutation({
-		mutationFn: async ({ text, img }) => {
+		mutationFn: async ({ text, img, placeName, location, bestSeasonToVisit }) => {
 			try {
 				const res = await fetch("/api/posts/create", {
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",
 					},
-					body: JSON.stringify({ text, img }),
+					body: JSON.stringify({ text, img, placeName, location, bestSeasonToVisit }),
 				});
 				const data = await res.json();
 				if (!res.ok) {
@@ -41,6 +44,9 @@ const CreatePost = () => {
 		onSuccess: () => {
 			setText("");
 			setImg(null);
+			setPlaceName("");
+			setLocation("");
+			setBestSeasonToVisit("");
 			toast.success("Post created successfully");
 			queryClient.invalidateQueries({ queryKey: ["posts"] });
 		},
@@ -48,7 +54,11 @@ const CreatePost = () => {
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
-		createPost({ text, img });
+		if (!placeName || !location || !bestSeasonToVisit) {
+			toast.error("Please fill in all required fields");
+			return;
+		}
+		createPost({ text, img, placeName, location, bestSeasonToVisit });
 	};
 
 	const handleImgChange = (e) => {
@@ -66,16 +76,44 @@ const CreatePost = () => {
 		<div className='flex p-4 items-start gap-4 border-b border-gray-700'>
 			<div className='avatar'>
 				<div className='w-8 rounded-full'>
-					<img src={authUser.profileImg || "/avatar-placeholder.png"} />
+					<img src={authUser.profileImg || "/avatar-placeholder.png"} alt="User avatar" />
 				</div>
 			</div>
 			<form className='flex flex-col gap-2 w-full' onSubmit={handleSubmit}>
 				<textarea
-					className='textarea w-full p-0 text-lg resize-none border-none focus:outline-none  border-gray-800'
+					className='textarea w-full p-0 text-lg resize-none border-none focus:outline-none border-gray-800'
 					placeholder='What is happening?!'
 					value={text}
 					onChange={(e) => setText(e.target.value)}
 				/>
+				<input
+					type="text"
+					placeholder="Name of the place *"
+					value={placeName}
+					onChange={(e) => setPlaceName(e.target.value)}
+					className='input input-bordered w-full'
+					required
+				/>
+				<input
+					type="text"
+					placeholder="Location *"
+					value={location}
+					onChange={(e) => setLocation(e.target.value)}
+					className='input input-bordered w-full'
+					required
+				/>
+				<select
+					value={bestSeasonToVisit}
+					onChange={(e) => setBestSeasonToVisit(e.target.value)}
+					className='select select-bordered w-full'
+					required
+				>
+					<option value="">Select best season to visit *</option>
+					<option value="spring">Spring</option>
+					<option value="summer">Summer</option>
+					<option value="autumn">Autumn</option>
+					<option value="winter">Winter</option>
+				</select>
 				{img && (
 					<div className='relative w-72 mx-auto'>
 						<IoCloseSharp
@@ -85,7 +123,7 @@ const CreatePost = () => {
 								imgRef.current.value = null;
 							}}
 						/>
-						<img src={img} className='w-full mx-auto h-72 object-contain rounded' />
+						<img src={img} className='w-full mx-auto h-72 object-contain rounded' alt="Selected image" />
 					</div>
 				)}
 
@@ -107,4 +145,5 @@ const CreatePost = () => {
 		</div>
 	);
 };
+
 export default CreatePost;

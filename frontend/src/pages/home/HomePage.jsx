@@ -5,6 +5,9 @@ import CreatePost from "./CreatePost";
 
 const HomePage = () => {
 	const [feedType, setFeedType] = useState("forYou");
+	const [selectedSeason, setSelectedSeason] = useState("all");
+
+	const seasons = ["all", "spring", "summer", "autumn", "winter"];
 
 	return (
 		<>
@@ -33,13 +36,29 @@ const HomePage = () => {
 					</div>
 				</div>
 
+				{/* Season Filter */}
+				{/* <div className="flex justify-center p-3 border-b border-gray-700">
+					<select
+						value={selectedSeason}
+						onChange={(e) => setSelectedSeason(e.target.value)}
+						className="select select-bordered w-full max-w-xs"
+					>
+						{seasons.map((season) => (
+							<option key={season} value={season}>
+								{season.charAt(0).toUpperCase() + season.slice(1)} {season === "all" ? "Seasons" : ""}
+							</option>
+						))}
+					</select>
+				</div> */}
+
 				{/*  CREATE POST INPUT */}
 				<CreatePost />
 
 				{/* POSTS */}
-				<Posts feedType={feedType} />
+				<Posts feedType={feedType} selectedSeason={selectedSeason} />
 			</div>
 		</>
 	);
 };
+
 export default HomePage;

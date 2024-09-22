@@ -1,9 +1,11 @@
+import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import Post from "./Post";
 import PostSkeleton from "../skeletons/PostSkeleton";
-import { useQuery } from "@tanstack/react-query";
-import { useEffect } from "react";
 
 const Posts = ({ feedType, username, userId }) => {
+	const [selectedSeason, setSelectedSeason] = useState("all");
+
 	const getPostEndpoint = () => {
 		switch (feedType) {
 			case "forYou":
@@ -27,10 +29,10 @@ const Posts = ({ feedType, username, userId }) => {
 		refetch,
 		isRefetching,
 	} = useQuery({
-		queryKey: ["posts"],
+		queryKey: ["posts", selectedSeason],
 		queryFn: async () => {
 			try {
-				const res = await fetch(POST_ENDPOINT);
+				const res = await fetch(`${POST_ENDPOINT}?season=${selectedSeason}`);
 				const data = await res.json();
 
 				if (!res.ok) {
@@ -46,10 +48,30 @@ const Posts = ({ feedType, username, userId }) => {
 
 	useEffect(() => {
 		refetch();
-	}, [feedType, refetch, username]);
+	}, [feedType, refetch, username, selectedSeason]);
+
+	const filteredPosts = selectedSeason === "all" 
+		? posts 
+		: posts?.filter(post => post.bestSeasonToVisit === selectedSeason);
 
 	return (
 		<>
+			<div className="mb-4">
+				<label htmlFor="season-select" className="mr-2">Filter by season:</label>
+				<select 
+					id="season-select"
+					value={selectedSeason} 
+					onChange={(e) => setSelectedSeason(e.target.value)}
+					className="bg-gray-700 text-white rounded p-1"
+				>
+					<option value="all">All Seasons</option>
+					<option value="spring">Spring</option>
+					<option value="summer">Summer</option>
+					<option value="autumn">Autumn</option>
+					<option value="winter">Winter</option>
+				</select>
+			</div>
+
 			{(isLoading || isRefetching) && (
 				<div className='flex flex-col justify-center'>
 					<PostSkeleton />
@@ -57,12 +79,12 @@ const Posts = ({ feedType, username, userId }) => {
 					<PostSkeleton />
 				</div>
 			)}
-			{!isLoading && !isRefetching && posts?.length === 0 && (
-				<p className='text-center my-4'>No posts in this tab. Switch 👻</p>
+			{!isLoading && !isRefetching && filteredPosts?.length === 0 && (
+				<p className='text-center my-4'>No posts found for the selected season. Try another season or tab 👻</p>
 			)}
-			{!isLoading && !isRefetching && posts && (
+			{!isLoading && !isRefetching && filteredPosts && (
 				<div>
-					{posts.map((post) => (
+					{filteredPosts.map((post) => (
 						<Post key={post._id} post={post} />
 					))}
 				</div>
@@ -70,4 +92,5 @@ const Posts = ({ feedType, username, userId }) => {
 		</>
 	);
 };
+
 export default Posts;

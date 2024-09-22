@@ -12,7 +12,17 @@ const postSchema = new mongoose.Schema(
 		},
 		img: {
 			type: String,
+			required: true,
 		},
+		placeName: {
+			type: String, required: true
+		},   // New field
+		location: {
+			type: String, required: true
+		},    // New field
+		bestSeasonToVisit: {
+			type: String, required: true
+		},  // New field
 		likes: [
 			{
 				type: mongoose.Schema.Types.ObjectId,
@@ -30,6 +40,7 @@ const postSchema = new mongoose.Schema(
 					ref: "User",
 					required: true,
 				},
+				createdAt: { type: Date, default: Date.now },
 			},
 		],
 	},

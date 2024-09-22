@@ -5,26 +5,36 @@ import { v2 as cloudinary } from "cloudinary";
 
 export const createPost = async (req, res) => {
 	try {
-		const { text } = req.body;
+		const { text, placeName, location, bestSeasonToVisit } = req.body;
 		let { img } = req.body;
+		 console.log("Incoming request body:", req.body);
 		const userId = req.user._id.toString();
 
 		const user = await User.findById(userId);
 		if (!user) return res.status(404).json({ message: "User not found" });
 
+		if (!placeName || !location || !bestSeasonToVisit ) {
+			 console.log("Validation Error: Missing required fields")
+			return res.status(400).json({ error: "Place name, location, and best season to visit are required" });
+		}
+
 		if (!text && !img) {
 			return res.status(400).json({ error: "Post must have text or image" });
 		}
 
-		if (img) {
-			const uploadedResponse = await cloudinary.uploader.upload(img);
-			img = uploadedResponse.secure_url;
-		}
-
+	  if (img) {
+      console.log("Uploading image...");
+      const uploadedResponse = await cloudinary.uploader.upload(img);
+      img = uploadedResponse.secure_url;
+      console.log("Image uploaded successfully:", img);
+    }
 		const newPost = new Post({
 			user: userId,
 			text,
 			img,
+			placeName,
+			location,
+			bestSeasonToVisit,  // New field
 		});
 
 		await newPost.save();
