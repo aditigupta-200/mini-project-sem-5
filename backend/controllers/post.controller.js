@@ -5,7 +5,7 @@ import { v2 as cloudinary } from "cloudinary";
 
 export const createPost = async (req, res) => {
 	try {
-		const { text, placeName, location, bestSeasonToVisit } = req.body;
+		const { text, placeName, location, bestSeasonToVisit, likes, ratings } = req.body;
 		let { img } = req.body;
 		 console.log("Incoming request body:", req.body);
 		const userId = req.user._id.toString();
@@ -34,7 +34,9 @@ export const createPost = async (req, res) => {
 			img,
 			placeName,
 			location,
-			bestSeasonToVisit,  // New field
+			bestSeasonToVisit,
+			likes,
+			ratings// New field
 		});
 
 		await newPost.save();

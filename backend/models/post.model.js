@@ -25,10 +25,17 @@ const postSchema = new mongoose.Schema(
 		},  // New field
 		likes: [
 			{
-				type: mongoose.Schema.Types.ObjectId,
-				ref: "User",
+				type: Number,
+				 default: 0,
 			},
 		],
+		rating: {
+        type: Number,
+        default: 0, // Default rating is 0
+        min: 0, // Minimum rating value
+        max: 5, // Maximum rating value
+    },
+ // Adds createdAt and updatedAt fields
 		comments: [
 			{
 				text: {

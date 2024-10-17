@@ -1,7 +1,12 @@
-const GenericIcon = (props) => (
-  <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
-    <path d="M12 2L1 21h22L12 2zm0 3.83L19.13 19H4.87L12 5.83zM11 16h2v2h-2v-2zm0-6h2v4h-2v-4z" />
-  </svg>
+import React from 'react';
+
+const Logo = ({ alt, className, ...props }) => (
+  <img
+    src="/yatrasahayaklogo.jpg"  // Replace with the actual path to your logo image
+    alt={alt || "Company Logo"}
+    className={`h-24 w-auto ${className || ''}`}  // Adjust the default height as needed
+    {...props}
+  />
 );
 
-export default GenericIcon;
+export default Logo;
